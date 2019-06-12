@@ -37,7 +37,7 @@ const int  POPULATION_SIZE = 100;
 const string GENES = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP"\
 "QRSTUVWXYZ 1234567890, .-;:_!\"#%&/()=?@${[]}"; 
 
-//target string to be generated:
+//string to be generated
 const string Target = "To be or not to be.";
 
 //Function generates random numbers in a given range
@@ -133,15 +133,15 @@ int main(){
         //create new generation:
         vector<Individual> new_gen;
 
-        //survival of the fittest: 10% of offspring make it to next gen
-        int s = (10*POPULATION_SIZE)/100;
+        //survival of the fittest: 15% of offspring make it to next gen
+        int s = (15*POPULATION_SIZE)/100;
         for(int i = 0; i < s; i++)
             new_gen.push_back(population[i]);
 
-        //50% of fittest population will mate:
-        s = (90*POPULATION_SIZE)/100;
+        //mating
+        s = (95*POPULATION_SIZE)/100;
         for(int i = 0; i < s; i++){
-            int len = population.size();
+            //int len = population.size();
             int r = randomNum(0,50);
             Individual parent1 = population[r];
             r = randomNum(0,50);
@@ -152,13 +152,13 @@ int main(){
         }
         cout << "pass";
         population = new_gen;
-        cout << "Generation: " << generation << "\n";
-        cout << "String: " << population[0].chromosome << "\n";
+        cout << "Generation: " << generation << "\t";
+        cout << "String: " << population[0].chromosome << "\t";
         cout << "Fitness: " << population[0].fitness << "\n";
 
         generation++; //incrementing the population
     }
-
+    cout << "\n\n================== RESULT ==================" << endl;
     cout << "Generation: " << generation << "\t";
     cout << "String: " << population[0].chromosome << "\t";
     cout << "Fitness: " << population[0].fitness << "\t";
