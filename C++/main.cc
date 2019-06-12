@@ -27,7 +27,6 @@ Genetic Algorithm Outline:
 #include <random>
 #include <string>
 #include <algorithm>
-//#include "population.h"
 using namespace std;
 
 
@@ -45,14 +44,9 @@ const string Target = "To be or not to be.";
 int randomNum(int start, int end);
 //create random genes for mutation 
 char mutated_genes();
+
 //create string of genes:
-string create_gnome(){
-    int len = Target.size();
-    string gnome = "";
-    for(int i = 0; i < len; i++)
-        gnome += mutated_genes();
-    return gnome;
-}
+string create_gnome();
 
 
 
@@ -92,14 +86,14 @@ Individual Individual::mate(Individual parent2){
     return Individual(child_chromosome);
 }
 
+
 //calculating fitness scorre is the number of characters in the string that
 //are the same or different
-
 int Individual::calculateFitness(){
     int len = Target.size();
     int fitness = 0;
     for(int i = 0; i < len; i++){
-        if(chromosome[i] == Target[i])
+        if(chromosome[i] != Target[i])
             fitness++;
     }
     return fitness;
@@ -132,11 +126,10 @@ int main(){
         sort(population.begin(), population.end());
 
         //if an individual has a fitness of 0 we know we have found it:
-        if(population[0].fitness == 0){
+        if(population[0].fitness <= 0){
             found = true;
             break;
         }
-
         //create new generation:
         vector<Individual> new_gen;
 
@@ -157,10 +150,11 @@ int main(){
             Individual offspring = parent1.mate(parent2);
             new_gen.push_back(offspring);
         }
+        cout << "pass";
         population = new_gen;
-        cout << "Generation: " << generation << "\t";
-        cout << "String: " << population[0].chromosome << "\t";
-        cout << "Fitness: " << population[0].fitness << "\t";
+        cout << "Generation: " << generation << "\n";
+        cout << "String: " << population[0].chromosome << "\n";
+        cout << "Fitness: " << population[0].fitness << "\n";
 
         generation++; //incrementing the population
     }
@@ -168,6 +162,7 @@ int main(){
     cout << "Generation: " << generation << "\t";
     cout << "String: " << population[0].chromosome << "\t";
     cout << "Fitness: " << population[0].fitness << "\t";
+
 
     return 0;
 }
@@ -185,6 +180,13 @@ char mutated_genes(){
     return GENES[random];
 }
 
+string create_gnome(){
+    int len = Target.size();
+    string gnome = "";
+    for(int i = 0; i < len; i++)
+        gnome += mutated_genes();
+    return gnome;
+}
 
 
 
