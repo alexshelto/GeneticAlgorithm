@@ -3,8 +3,8 @@
 ## Outline for my projects
 * Randomly initialize populations
 * Determine finess of population
-* Until convergence, repeat:
-** Select parents
-** Crossover and create new possibilities
-** Preform mutations
-** Calculate fitness
++ Until convergence, repeat:
+1.) Select parents
+2.) Crossover and create new possibilities
+3.) Preform mutations
+4.) Calculate fitness
