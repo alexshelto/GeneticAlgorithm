@@ -1,46 +1,118 @@
 # Alexander Shelton
 #
-#
-#
+
+
 import pygame
-from pygame.locals import *
 from pygame import gfxdraw
 
-import time
 import random
-import math
 import numpy
-
+import math
 
 #-------------- Constants ---------------------------------------------------------------+
 #Window Settings:
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-RED = (255,0,0)
-GREEN = (0,255,0)
-BLUE = (0,0,255)
-fps=60
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 800
-BALL_SIZE = 10
+red = (255,0,0)
+green = (0,255,0)
+black = (0,0,0)
+blue = (0,0,255)
+height = 600
+width = 600
+boundary = 10
 
 
-settings = {}
-#Evolution Settings:
-settings['population_size'] = 100  #Number of organisms
-settings['food_num'] = 200         #Number of food entities on screen
-settings['generations'] = 100      #Number of generations
-settings['mutation_rate'] = 0.10   #Rate at which organisms mutate
-settings['size'] = 5
-settings['health'] = 100
+settings = {
+    'max_vel': 10,
+    'health': 100
+}
 
-#Simulation Settings:
-settings['generation_time'] = 100  #Generation length (Seconds)
-settings['dt'] = 0.04              #Time step
-settings['v_max'] = 0.5            #Max Velocity
 
 #---------------Functions ----------------------------------------------------------------+
 
+
+
+def main():
+
+    #Starting module:
+    pygame.init()
+    display = pygame.display.set_mode([height, width])
+    clock = pygame.time.Clock()
+
+   
+
+
+    orgs = []
+    predators = []
+    food = []
+    poison = []
+
+    for i in range(5):
+        food.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))   
+    for i in range(5):
+        orgs.append(Organism(settings, display, random.randrange(0,height), random.randrange(0,width)))
+        predators.append(Predator(settings, display, random.randrange(0,height), random.randrange(0,width)))
+        food.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))   
+    running = True
+    while(running):
+        display.fill(black)
+
+        if random.random()<0.01:
+            poison.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))
+
+        if len(orgs) < 5 or random.random() < 0.0001:
+            orgs.append(Organism(settings, display, random.randrange(0,height), random.randrange(0,width)))
+        
+        if len(food) < 15:
+            food.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))
+
+
+
+        for org in orgs[::-1]:
+            print(org.health)
+            org.eat(food)
+            org.eat(poison)
+            org.boundaries()
+
+            org.update()
+            org.draw()
+
+            if org.dead(food):
+                orgs.remove(org)
+                print("Organism died")
+        
+        for pred in predators[::-1]:
+            pred.fight(orgs)
+            pred.boundaries()
+
+            pred.update()
+            pred.draw()
+
+
+        for i in food:
+            pygame.draw.circle(display, (0,0,225), [int(i[0]), int(i[1])], 3)
+            
+        for i in poison:
+            pygame.draw.circle(display, (122,4,233),[int(i[0]), int(i[1])], 3)
+        pygame.display.update()
+        clock.tick(60)
+
+    pygame.quit()
+
+
+
+
+
+def magnitude_calc(vector): 
+    x = 0
+    for i in vector:
+        x += i**2
+    magnitude = x**0.5
+    return magnitude
+
+def normalise(vector):
+    magnitude = magnitude_calc(vector)
+    if magnitude != 0:
+        vector = vector / magnitude
+    return vector
 
 
 
@@ -50,15 +122,233 @@ settings['v_max'] = 0.5            #Max Velocity
 
 #--------------------- Classes -----------------------------------------------------------+
 
-class Organism():
-    def __init__(self, dna=False):
-        self.position = numpy.array([random.randrange(0,SCREEN_WIDTH), random.randrange(0,SCREEN_HEIGHT)])
 
-        self.color = BLUE
-        self.health = 100
-        self.max_vel = 3
-        self.size = 5
-        self.age = 1
+class Organism:
+    def __init__(self, settings, window, xpos, ypos):
+        self.position = numpy.array([xpos,ypos], dtype='float64')
+        self.velocity = numpy.array([random.uniform(-settings['max_vel'],settings['max_vel']),random.uniform(-settings['max_vel'],settings['max_vel'])], dtype='float64')
+        self.acceleration = numpy.array([0, 0], dtype='float64')
+        self.angle = 0 
+
+        self.max_vel = 1.5
+        self.max_force = .6
+        self.color = green
+        self.size = 6
+        self.health = settings['health']
+
+        self.window = window
+
+    def apply_force(self, force):
+        self.acceleration += force
+    
+    def find(self, target):
+        desired_vel = numpy.add(target,-self.position))
+        desired_vel = normalise(desired_vel)*self.max_vel
+
+        steering_force = numpy.add(desired_vel, -self.velocity)
+        steering_force = normalise(steering_force)*self.max_force
+        
+        return(steering_force)
+
+
+    def eat(self, itemList):
+        if itemList == 'food':
+            hp = 20
+        else:
+            hp = -40
+        closest = None
+
+        closest_distance = max(width, height)
+
+        posx = self.position[0]
+        posy = self.position[1]
+
+        foodIndex = len(itemList)-1
+
+        for i in itemList[::-1]:
+            item_x = i[0]
+            item_y = i[1]
+
+            distance = math.hypot(posx-item_x, posy-item_y)
+
+            if distance < 5:
+                itemList.pop(foodIndex)
+                self.health += hp
+
+            if distance < closest_distance:
+                closest_distance = distance
+                closest = i
+            foodIndex -= 1
+
+        prey = self.find(closest)
+        seek = normalise(prey)*self.max_force
+        self.apply_force(seek)
+
+
+
+    def update(self):
+        self.velocity += self.acceleration
+        self.velocity = normalise(self.velocity)*self.max_vel
+
+        self.position += self.velocity
+        self.acceleration *= 0
+        self.health -= 0.2
+        self.health = min(settings['health'], self.health)
+
+    def draw(self):
+        pygame.gfxdraw.aacircle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
+        pygame.gfxdraw.filled_circle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
+
+    def dead(self, itemList):
+        if self.health > 0:
+            return False
+        else:
+            if self.position[0] < width-boundary and self.position[0] > boundary and self.position[1] < height-boundary and self.position[1] > boundary:
+                itemList.append(self.position)
+
+            return True
+
+    def boundaries(self):
+            desired = None
+            
+            #if x value is on frame of boundary or visable window
+            if self.position[0] < boundary:
+                desired = numpy.array([self.max_vel, self.velocity[1]])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+
+            #if x value is larger than the window or outside
+            elif self.position[0] > width - boundary:
+                desired = numpy.array([-self.max_vel, self.velocity[1]])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            #y value on boarder frame
+            if self.position[1] < boundary:
+                desired = numpy.array([self.velocity[0], self.max_vel])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            # y value outside of window range
+            elif self.position[1] > height - boundary:
+                desired = numpy.array([self.velocity[0], -self.max_vel])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            
+
+
+
+
+
+class Predator:
+    def __init__(self, settings, window, xpos, ypos):
+        self.position = numpy.array([xpos,ypos], dtype='float64')
+        self.velocity = numpy.array([random.uniform(-settings['max_vel'],settings['max_vel']),random.uniform(-settings['max_vel'],settings['max_vel'])], dtype='float64')
+        self.acceleration = numpy.array([0, 0], dtype='float64')
+        self.angle = 0 
+
+        self.max_vel = 1.1
+        self.max_force = .3
+        self.color = red
+        self.size = 4
+        self.health = settings['health']
+
+        self.power = 25
+
+        self.window = window
+
+    def apply_force(self, force):
+        self.acceleration += force
+    
+    def update(self):
+        self.velocity += self.acceleration
+        self.velocity = normalise(self.velocity)*self.max_vel
+
+        self.position += self.velocity
+        self.acceleration *= 0
+        self.health -= 1
+        self.health = min(settings['health'], self.health)
+
+    def draw(self):
+        pygame.gfxdraw.aacircle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
+        pygame.gfxdraw.filled_circle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
+
+    def find(self, target):
+        desired_vel = numpy.add(target.position, -self.position)
+        desired_vel = normalise(desired_vel)*self.max_vel
+
+        steering_force = numpy.add(desired_vel, -self.velocity)
+        steering_force = normalise(steering_force)*self.max_force
+        
+        return(steering_force)
+
+
+
+
+    def fight(self, itemList):
+        closest = None
+
+        closest_distance = max(width, height)
+
+        posx = self.position[0]
+        posy = self.position[1]
+
+        foodIndex = len(itemList)-1
+
+        for i in itemList[::-1]:
+            item_x = i.position[0]
+            item_y = i.position[1]
+
+            distance = math.hypot(posx-item_x, posy-item_y)
+
+            if distance < 3:
+                i.health = i.health - self.power
+                if(i.health < 0):
+                    self.health += 40
+
+            if distance < closest_distance:
+                closest_distance = distance
+                closest = i
+            foodIndex -= 1
+
+        prey = self.find(closest)
+        seek = normalise(prey)*self.max_force
+        self.apply_force(seek)
+
+
+    def boundaries(self):
+            desired = None
+            
+            #if x value is on frame of boundary or visable window
+            if self.position[0] < boundary:
+                desired = numpy.array([self.max_vel, self.velocity[1]])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+
+            #if x value is larger than the window or outside
+            elif self.position[0] > width - boundary:
+                desired = numpy.array([-self.max_vel, self.velocity[1]])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            #y value on boarder frame
+            if self.position[1] < boundary:
+                desired = numpy.array([self.velocity[0], self.max_vel])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            # y value outside of window range
+            elif self.position[1] > height - boundary:
+                desired = numpy.array([self.velocity[0], -self.max_vel])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            
+
+
 
 
 
@@ -73,3 +363,11 @@ class Organism():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+
