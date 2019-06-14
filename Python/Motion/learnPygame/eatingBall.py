@@ -12,11 +12,15 @@ black = (0,0,0)
 blue = (0,0,255)
 height = 600
 width = 600
+boundary = 10
 
 
 
-settings = {}
-settings['max_vel'] = 10
+settings = {
+    'max_vel': 10,
+    'health': 100
+}
+
 
 
 
@@ -28,6 +32,8 @@ def main():
     pygame.init()
     display = pygame.display.set_mode([height, width])
     clock = pygame.time.Clock()
+
+
 
 
     orgs = []
@@ -50,15 +56,23 @@ def main():
 
 
         for org in orgs[::-1]:
+            print(org.health)
             org.eat(food)
+            org.boundaries()
 
             org.update()
             org.draw()
+
+            if org.dead(food):
+                orgs.remove(org)
+                print("Organism died")
+        
 
 
         for i in food:
             pygame.draw.circle(display, (0,0,225), [int(i[0]), int(i[1])], 3)
             
+    
         pygame.display.update()
         clock.tick(60)
 
@@ -94,7 +108,7 @@ class Organism:
         self.max_force = .6
         self.color = green
         self.size = 6
-        self.health = 100
+        self.health = settings['health']
 
         self.window = window
 
@@ -129,7 +143,7 @@ class Organism:
 
             if distance < 5:
                 itemList.pop(foodIndex)
-                self.health += .2
+                self.health += 5
 
             if distance < closest_distance:
                 closest_distance = distance
@@ -148,12 +162,51 @@ class Organism:
 
         self.position += self.velocity
         self.acceleration *= 0
-        self.health -= 0.1
+        self.health -= 0.2
+        self.health = min(settings['health'], self.health)
 
     def draw(self):
         pygame.gfxdraw.aacircle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
         pygame.gfxdraw.filled_circle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
 
+    def dead(self, itemList):
+        if self.health > 0:
+            return False
+        else:
+            if self.position[0] < width-boundary and self.position[0] > boundary and self.position[1] < height-boundary and self.position[1] > boundary:
+                itemList.append(self.position)
+
+            return True
+
+    def boundaries(self):
+            desired = None
+            
+            #if x value is on frame of boundary or visable window
+            if self.position[0] < boundary:
+                desired = numpy.array([self.max_vel, self.velocity[1]])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+
+            #if x value is larger than the window or outside
+            elif self.position[0] > width - boundary:
+                desired = numpy.array([-self.max_vel, self.velocity[1]])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            #y value on boarder frame
+            if self.position[1] < boundary:
+                desired = numpy.array([self.velocity[0], self.max_vel])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            # y value outside of window range
+            elif self.position[1] > height - boundary:
+                desired = numpy.array([self.velocity[0], -self.max_vel])
+                steer = desired-self.velocity
+                steer = normalise(steer)*self.max_force
+                self.apply_force(steer)
+            
 
 
 
