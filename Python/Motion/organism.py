@@ -8,6 +8,7 @@ from pygame import gfxdraw
 import random
 import numpy
 import math
+
 from physics import normalise, magnitude_calc
 
 
@@ -17,23 +18,51 @@ with open('config.json') as config_file:
 
 
 
+#    DNA
+# DNA[0] = max force , DNA[1]= steering weight , DNA[2] = perception
+#
+#
+
+
 
 
 class Organism:
-    def __init__(self, settings, window, xpos, ypos):
+    def __init__(self, settings, window, xpos, ypos, dna=False):
         self.position = numpy.array([xpos,ypos], dtype='float64')
         self.velocity = numpy.array([random.uniform(-settings['organism']['max_vel'],settings['organism']['max_vel']),random.uniform(-settings['organism']['max_vel'],settings['organism']['max_vel'])], dtype='float64')
         self.acceleration = numpy.array([0, 0], dtype='float64')
         self.angle = 0 
 
-        self.max_vel = settings['predator']['max_vel']
-        self.max_force = .6
+        self.max_vel = settings['organism']['max_vel']
+        self.max_force = settings['organism']['max_force']
         self.color = settings['colors']['green']
         self.size = 6
         self.health = settings['organism']['health']
 
         self.window = window
 
+
+        if dna != False:
+            self.dna = []
+            for gene in range(len(dna)):
+                if random.random() < settings['organism']['reproduction_rate']:
+                    if gene < 2:
+                        self.dna.append(dna[gene]+ random.uniform(-settings['organism_mutation']['steering_weight'],settings['organism_mutation']['steering_weight'] ))
+                    else:
+                        self.dna.append(dna[gene] + random.uniform(-settings['organism_mutation']['perception_mutation'],settings['organism_mutation']['perception_mutation'] ))
+                else:
+                    self.dna.append(dna[gene])
+        else: #load with random dna
+            self.dna = [random.uniform(-settings['organism']['max_force'],settings['organism']['max_force']),
+            random.uniform(-settings['organism']['max_force'],settings['organism']['max_force']),random.uniform(0,settings['organism']['perception_radius']), random.uniform(0, settings['organism']['perception_radius'])]
+            print(self.dna)
+
+
+
+    def reproduce(self, orgList):
+        if random.random() < settings['organism']['reproduction_rate']:
+            orgList.append(Organism(settings, self.window,self.position[0], self.position[1],self.dna))
+            print("reproduction")
     def apply_force(self, force):
         self.acceleration += force
     
@@ -76,9 +105,12 @@ class Organism:
                 closest_distance = distance
                 closest = i
             foodIndex -= 1
-        prey = self.find(closest)
-        seek = normalise(prey)*self.max_force
-        self.apply_force(seek)
+
+        if closest_distance < self.dna[2]:
+            prey = self.find(closest)
+            prey *= self.dna[2]
+            seek = normalise(prey)*self.max_force
+            self.apply_force(seek)
 
 
 
@@ -86,14 +118,19 @@ class Organism:
         self.velocity += self.acceleration
         self.velocity = normalise(self.velocity)*self.max_vel
 
-        self.position += self.velocity
-        self.acceleration *= 0
+        self.position += self.velocity 
+        self.acceleration *= 0 #resets acceleration to 0
         self.health -= 0.2
         self.health = min(settings['organism']['health'], self.health)
 
     def draw(self):
+        ## Shape of organism
         pygame.gfxdraw.aacircle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
         pygame.gfxdraw.filled_circle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
+
+        #Visual Atributes:
+        pygame.gfxdraw.aacircle(self.window,int(self.position[0]), int(self.position[1]),abs(int(self.dna[2])), settings['colors']['white'])
+
 
     def dead(self, itemList):
         if self.health > 0:
@@ -134,3 +171,7 @@ class Organism:
                 self.apply_force(steer)
             
 
+    def returnFitness(self):
+        pass
+        #clock = 
+        #return self.timeAlive (secs)

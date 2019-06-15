@@ -4,7 +4,7 @@
     "pygame_settings"    : {
         "window_height"  : 800,
         "window_width"   : 800,
-        "boundary"       : 10,
+        "boundary"       : 15,
         "fps"            : 60
     },
     "colors"             : {
@@ -16,12 +16,26 @@
     },
     "organism"           : {
         "health"         : 100,
-        "max_vel"        : 10
+        "max_vel"        : 6,
+        "max_force"      : 1,
+        "reproduction_rate": 0.0005,
+        "perception_radius": 100
         },
+    "organsims_mutation" :{
+        "mutation_rate"  : 0.25,
+        "steering_weight": 0.5,
+        "perception_mutation": 40
+    },
     "predator"           :{
         "health"         : 120,
-        "max_vel"        : 1.3,
+        "max_vel"        : 5.5,
         "attack"         : 40
+    },
+    "predator_mutation"  :{
+        "mutatuin_rate"  : 0.19,
+        "steering_weight": 0.5,
+        "perception_mutatuin": 35,
+        "attack_mutation": 15
     }
 
     }

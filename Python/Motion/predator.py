@@ -22,11 +22,11 @@ class Predator:
         self.acceleration = numpy.array([0, 0], dtype='float64')
         self.angle = 0 
 
-        self.max_vel = 1.1
+        self.max_vel = settings['predator']['max_vel']
         self.max_force = .3
         self.color = settings['colors']['red']
         self.size = 4
-        self.health = settings['organism']['health']
+        self.health = settings['predator']['health']
 
         self.power = 25
 
@@ -76,7 +76,7 @@ class Predator:
 
             distance = math.hypot(posx-item_x, posy-item_y)
 
-            if distance < 3:
+            if distance < 4:
                 i.health = i.health - self.power
                 if(i.health < 0):
                     self.health += 40

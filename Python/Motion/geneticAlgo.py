@@ -1,7 +1,6 @@
 # Alexander Shelton
 #
 
-import json
 
 import organism
 import predator
@@ -12,8 +11,18 @@ from pygame import gfxdraw
 import random
 import numpy
 import math
+import json
 
 
+
+#TODO make a timer, add dna, add fitness
+
+
+#ORGANISM DNA: speed, force, health,  Vision distance, steering ,?cooperative, shoot?
+
+#PREDATOR DNA: speed, strength, steering, vision 
+
+#fix nonetype & float in find: desired val var
 
 
 #---------------Functions ----------------------------------------------------------------+
@@ -40,9 +49,9 @@ def main():
     food = []
     poison = []
 
-    for i in range(5):
+    for i in range(40):
         food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))   
-    for i in range(5):
+    for i in range(8):
         orgs.append(organism.Organism(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
         predators.append(predator.Predator(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
         food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))   
@@ -57,7 +66,7 @@ def main():
         if len(orgs) < 5 or random.random() < 0.0001:
             orgs.append(organism.Organism(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
         
-        if len(food) < 15:
+        if len(food) < 50:
             food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))
 
         for event in pygame.event.get():
@@ -66,7 +75,7 @@ def main():
 
 
         for org in orgs[::-1]:
-            print(org.health)
+            # print(org.health)
             org.eat(food,0)
             org.eat(poison,1)
             org.boundaries()
@@ -77,6 +86,8 @@ def main():
             if org.dead(food):
                 orgs.remove(org)
                 print("Organism died")
+            else:
+                org.reproduce(orgs)
         
         for pred in predators[::-1]:
             pred.fight(orgs)
