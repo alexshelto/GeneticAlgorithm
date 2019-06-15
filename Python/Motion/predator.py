@@ -10,14 +10,6 @@ import json
 from physics import normalise, magnitude_calc
 
 
-red = (255,0,0)
-green = (0,255,0)
-black = (0,0,0)
-blue = (0,0,255)
-height = 600
-width = 600
-boundary = 10
-
 
 with open('config.json') as config_file:
         settings = json.load(config_file)
@@ -71,7 +63,7 @@ class Predator:
     def fight(self, itemList):
         closest = None
 
-        closest_distance = max(width, height)
+        closest_distance = max(settings['pygame_settings']['window_width'], settings['pygame_settings']['window_height'])
 
         posx = self.position[0]
         posy = self.position[1]
@@ -102,27 +94,27 @@ class Predator:
     def boundaries(self):
             desired = None
             
-            #if x value is on frame of boundary or visable window
-            if self.position[0] < boundary:
+            #if x value is on frame of settings['pygame_settings']['boundary'] or visable window
+            if self.position[0] < settings['pygame_settings']['boundary']:
                 desired = numpy.array([self.max_vel, self.velocity[1]])
                 steer = desired-self.velocity
                 steer = normalise(steer)*self.max_force
                 self.apply_force(steer)
 
             #if x value is larger than the window or outside
-            elif self.position[0] > width - boundary:
+            elif self.position[0] > settings['pygame_settings']['window_width'] - settings['pygame_settings']['boundary']:
                 desired = numpy.array([-self.max_vel, self.velocity[1]])
                 steer = desired-self.velocity
                 steer = normalise(steer)*self.max_force
                 self.apply_force(steer)
             #y value on boarder frame
-            if self.position[1] < boundary:
+            if self.position[1] < settings['pygame_settings']['boundary']:
                 desired = numpy.array([self.velocity[0], self.max_vel])
                 steer = desired-self.velocity
                 steer = normalise(steer)*self.max_force
                 self.apply_force(steer)
             # y value outside of window range
-            elif self.position[1] > height - boundary:
+            elif self.position[1] > settings['pygame_settings']['window_height'] - settings['pygame_settings']['boundary']:
                 desired = numpy.array([self.velocity[0], -self.max_vel])
                 steer = desired-self.velocity
                 steer = normalise(steer)*self.max_force

@@ -13,16 +13,6 @@ import random
 import numpy
 import math
 
-#-------------- Constants ---------------------------------------------------------------+
-#Window Settings:
-red = (255,0,0)
-green = (0,255,0)
-black = (0,0,0)
-blue = (0,0,255)
-height = 600
-width = 600
-boundary = 10
-
 
 
 
@@ -39,7 +29,7 @@ def main():
 
     #Starting module:
     pygame.init()
-    display = pygame.display.set_mode([height, width])
+    display = pygame.display.set_mode([settings['pygame_settings']['window_height'],settings['pygame_settings']['window_width']])
     clock = pygame.time.Clock()
 
    
@@ -51,24 +41,24 @@ def main():
     poison = []
 
     for i in range(5):
-        food.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))   
+        food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))   
     for i in range(5):
-        orgs.append(organism.Organism(settings, display, random.randrange(0,height), random.randrange(0,width)))
-        predators.append(predator.Predator(settings, display, random.randrange(0,height), random.randrange(0,width)))
-        food.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))   
-        poison.append((numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64')))
+        orgs.append(organism.Organism(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
+        predators.append(predator.Predator(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
+        food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))   
+        poison.append((numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64')))
     running = True
     while(running):
-        display.fill(black)
+        display.fill(settings['colors']['black'])
 
         if random.random()<0.01:
-            poison.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))
+            poison.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))
 
         if len(orgs) < 5 or random.random() < 0.0001:
-            orgs.append(organism.Organism(settings, display, random.randrange(0,height), random.randrange(0,width)))
+            orgs.append(organism.Organism(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
         
         if len(food) < 15:
-            food.append(numpy.array([random.uniform(0, width), random.uniform(0, height)], dtype='float64'))
+            food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
