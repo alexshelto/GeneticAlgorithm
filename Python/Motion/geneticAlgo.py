@@ -1,6 +1,8 @@
 # Alexander Shelton
 #
 
+import json
+
 import organism
 import predator
 
@@ -22,10 +24,6 @@ width = 600
 boundary = 10
 
 
-settings = {
-    'max_vel': 10,
-    'health': 100
-}
 
 
 #---------------Functions ----------------------------------------------------------------+
@@ -33,6 +31,11 @@ settings = {
 
 
 def main():
+
+
+
+    with open('config.json') as config_file:
+        settings = json.load(config_file)
 
     #Starting module:
     pygame.init()

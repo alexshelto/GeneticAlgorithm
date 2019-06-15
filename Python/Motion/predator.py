@@ -5,6 +5,9 @@ from pygame import gfxdraw
 import random
 import numpy
 import math
+import json
+
+from physics import normalise, magnitude_calc
 
 
 red = (255,0,0)
@@ -16,39 +19,22 @@ width = 600
 boundary = 10
 
 
-settings = {
-    'max_vel': 10,
-    'health': 100
-}
-
-def magnitude_calc(vector): 
-    x = 0
-    for i in vector:
-        x += i**2
-    magnitude = x**0.5
-    return magnitude
-
-def normalise(vector):
-    magnitude = magnitude_calc(vector)
-    if magnitude != 0:
-        vector = vector / magnitude
-    return vector
-
-
+with open('config.json') as config_file:
+        settings = json.load(config_file)
 
 
 class Predator:
     def __init__(self, settings, window, xpos, ypos):
         self.position = numpy.array([xpos,ypos], dtype='float64')
-        self.velocity = numpy.array([random.uniform(-settings['max_vel'],settings['max_vel']),random.uniform(-settings['max_vel'],settings['max_vel'])], dtype='float64')
+        self.velocity = numpy.array([random.uniform(-settings['organism']['max_vel'],settings['organism']['max_vel']),random.uniform(-settings['organism']['max_vel'],settings['organism']['max_vel'])], dtype='float64')
         self.acceleration = numpy.array([0, 0], dtype='float64')
         self.angle = 0 
 
         self.max_vel = 1.1
         self.max_force = .3
-        self.color = red
+        self.color = settings['colors']['red']
         self.size = 4
-        self.health = settings['health']
+        self.health = settings['organism']['health']
 
         self.power = 25
 
@@ -64,7 +50,7 @@ class Predator:
         self.position += self.velocity
         self.acceleration *= 0
         self.health -= 1
-        self.health = min(settings['health'], self.health)
+        self.health = min(settings['predator']['health'], self.health)
 
     def draw(self):
         pygame.gfxdraw.aacircle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)

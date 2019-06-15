@@ -1,0 +1,27 @@
+
+
+  {
+    "pygame_settings"    : {
+        "window_height"  : 800,
+        "window_width"   : 800,
+        "boundary"       : 10,
+        "fps"            : 60
+    },
+    "colors"             : {
+        "red"            : [255,0,0],
+        "green"          : [0,255,0],
+        "blue"           : [0,0,255],
+        "white"          : [255,255,255],
+        "black"          : [0,0,0]
+    },
+    "organism"           : {
+        "health"         : 100,
+        "max_vel"        : 10
+        },
+    "predator"           :{
+        "health"         : 120,
+        "max_vel"        : 1.3,
+        "attack"         : 40
+    }
+
+    }
