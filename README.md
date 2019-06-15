@@ -25,4 +25,6 @@ For motion I used vectors. Which required me to calculate the magnitudes of vect
 Normalizing vectos is important because it keeps your vectors uniform at size n=1
 
 ## Where im at right now:
+Green organisms find food(blue) and poison(purple) while evading predators (red)
+green organisms have dna for motion, force vector, perception
 ![alt text](https://raw.githubusercontent.com/alexshelto/GeneticAlgorithm/master/screenshots/pygame-gensim.png)
