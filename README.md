@@ -25,4 +25,4 @@ For motion I used vectors. Which required me to calculate the magnitudes of vect
 Normalizing vectos is important because it keeps your vectors uniform at size n=1
 
 ## Where im at right now:
-![alt text](https://raw.githubusercontent.com/alexshelto/GeneticAlgorithim/master/screenshots/pygame-gensim.png)
+![alt text](https://raw.githubusercontent.com/alexshelto/GeneticAlgorithm/master/screenshots/pygame-gensim.png)
