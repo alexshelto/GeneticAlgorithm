@@ -4,7 +4,7 @@ Alexander Shelton
 Simple C++ Genetic algorithm program
 
 
-Randomizes first 50 digits of e
+Randomizes first 225 digits of e
 
 
 
@@ -26,17 +26,19 @@ Genetic Algorithm Outline:
 #include <random>
 #include <string>
 #include <algorithm>
+#include "time.h"
 using namespace std;
 
 
 
-const int  POPULATION_SIZE = 100;
+const int  POPULATION_SIZE = 150;
 
 // Valid Genes 
 const string GENES = "0123456789."; 
 
 //string to be generated
-const string Target = "2.718281828459045235360287471352662497757247093699959574966967627724076630353";
+const string Target = "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526059563073813232862794349076323382988075319525101901157383418793070215408914";
+//"2.718281828459045235360287471352662497757247093699959574966967627724076630353";
 
 //Function generates random numbers in a given range
 int randomNum(int start, int end);
@@ -74,7 +76,7 @@ Individual Individual::mate(Individual parent2){
         float p = randomNum(0, 100)/100; //mutation rate calc
         if( p < .45) //if probablility is < .45 insert gene from parent 1
             child_chromosome += parent2.chromosome[i];
-        else if(p < 0.90)//if prob is between .45 and .90 insert gene from parent 1
+        else if(p < 0.80)//if prob is between .45 and .90 insert gene from parent 1
             child_chromosome += chromosome[i];
         else
             child_chromosome += mutated_genes();
@@ -105,6 +107,10 @@ bool operator < (const Individual &i1, const Individual &i2){
 
 
 int main(){
+
+    clock_t t1,t2;
+
+    t1 = clock();
     srand((unsigned)(time(0)));
 
     //current generation:
@@ -150,18 +156,25 @@ int main(){
         }
         cout << "pass";
         population = new_gen;
-        cout << "Generation: " << generation << "\t";
-        cout << "String: " << population[0].chromosome << "\t";
+        cout << "Generation: " << generation << "\n";
+        cout << "String: " << population[0].chromosome << "\n";
         cout << "Fitness: " << population[0].fitness << "\n";
 
         generation++; //incrementing the population
     }
+
+    t2 = clock();
+    float diff ((float)t2-(float)t1);
+    float sec = diff / CLOCKS_PER_SEC;
+
+
+
     cout << "\n\n================== RESULT ==================" << endl;
-    cout << "Generation: " << generation << "\t";
-    cout << "String: " << population[0].chromosome << "\t";
-    cout << "Fitness: " << population[0].fitness << "\t";
+    cout << "Generation: " << generation << "\n";
+    cout << "String: " << population[0].chromosome << "\n";
+    cout << "Fitness: " << population[0].fitness << "\n";
 
-
+    cout << "\n\nExecution time: " << sec << endl;
     return 0;
 }
 
