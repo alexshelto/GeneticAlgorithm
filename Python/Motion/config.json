@@ -12,23 +12,24 @@
         "green"          : [0,255,0],
         "blue"           : [0,0,255],
         "white"          : [255,255,255],
-        "black"          : [0,0,0]
+        "black"          : [0,0,0],
+        "yellow"         : [255,255,0]
     },
     "organism"           : {
         "health"         : 100,
-        "max_vel"        : 6,
-        "max_force"      : 1,
+        "max_vel"        : 1.5,
+        "max_force"      : 0.8,
         "reproduction_rate": 0.0005,
         "perception_radius": 100
         },
-    "organsims_mutation" :{
+    "organsim_mutation" :{
         "mutation_rate"  : 0.25,
         "steering_weight": 0.5,
         "perception_mutation": 40
     },
     "predator"           :{
         "health"         : 120,
-        "max_vel"        : 5.5,
+        "max_vel"        : 1.5,
         "attack"         : 40
     },
     "predator_mutation"  :{

@@ -23,6 +23,17 @@ with open('config.json') as config_file:
 #
 #
 
+DNA = {
+    'color': ,
+    'speed_multiplier', 
+    'health_bonus'    ,
+    'steering_weights',
+    'max_force'       ,
+    'perception_mutation' ,
+    'reproduction_rate:', 
+
+}
+
 
 
 
@@ -41,6 +52,12 @@ class Organism:
 
         self.window = window
 
+        self.fitness = 0
+
+
+        if dna == False:
+            self.dna = {}
+            
 
         if dna != False:
             self.dna = []
@@ -108,7 +125,7 @@ class Organism:
 
         if closest_distance < self.dna[2]:
             prey = self.find(closest)
-            prey *= self.dna[2]
+            prey *= self.dna[index]
             seek = normalise(prey)*self.max_force
             self.apply_force(seek)
 
@@ -123,14 +140,24 @@ class Organism:
         self.health -= 0.2
         self.health = min(settings['organism']['health'], self.health)
 
+        self.fitness += 1
+
     def draw(self):
         ## Shape of organism
         pygame.gfxdraw.aacircle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
         pygame.gfxdraw.filled_circle(self.window, int(self.position[0]), int(self.position[1]), self.size, self.color)
 
         #Visual Atributes:
-        pygame.gfxdraw.aacircle(self.window,int(self.position[0]), int(self.position[1]),abs(int(self.dna[2])), settings['colors']['white'])
+        #food and poison range:
+        pygame.draw.circle(self.window, settings['colors']['red'], (int(self.position[0]), int(self.position[1])), abs(int(self.dna[3])), abs(int(min(2, self.dna[3]))))
+        pygame.draw.circle(self.window, settings['colors']['green'], (int(self.position[0]), int(self.position[1])), abs(int(self.dna[2])), abs(int(min(2, self.dna[2]))))
 
+        #Speed:
+
+
+
+        # pygame.gfxdraw.aacircle(self.window,int(self.position[0]), int(self.position[1]),abs(int(self.dna[2])), settings['colors']['white'])
+        # pygame.gfxdraw.aacircle(self.window,int(self.position[0]), int(self.position[1]),abs(int(self.dna[0])), settings['colors']['yellow'] )
 
     def dead(self, itemList):
         if self.health > 0:

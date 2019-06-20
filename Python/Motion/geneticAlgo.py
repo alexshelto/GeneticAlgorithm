@@ -49,9 +49,9 @@ def main():
     food = []
     poison = []
 
-    for i in range(40):
+    for i in range(50):
         food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))   
-    for i in range(8):
+    for i in range(10):
         orgs.append(organism.Organism(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
         predators.append(predator.Predator(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
         food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))   
@@ -66,7 +66,10 @@ def main():
         if len(orgs) < 5 or random.random() < 0.0001:
             orgs.append(organism.Organism(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
         
-        if len(food) < 50:
+        if len(predators) < 10:
+            predators.append(predator.Predator(settings, display, random.randrange(0,settings['pygame_settings']['window_height']), random.randrange(0,settings['pygame_settings']['window_width'])))
+
+        if len(food) < 100:
             food.append(numpy.array([random.uniform(0, settings['pygame_settings']['window_width']), random.uniform(0, settings['pygame_settings']['window_height'])], dtype='float64'))
 
         for event in pygame.event.get():
